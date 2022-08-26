@@ -20,4 +20,8 @@
         const WS_REPORT = "WsReport-1.2.dll";
         const EDUCATION = "Education.exe";
     }
+
+    class General {
+        const LDAP_SERVER = "ldap://localhost";
+    }
 ?>

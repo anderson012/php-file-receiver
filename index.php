@@ -1,30 +1,44 @@
 <?php
     namespace Main;
     // imports
+    // controllers
     include_once("./controllers/receiver.controller.php");
     include_once("./controllers/response.controller.php");
     include_once("./controllers/auth.controller.php");
-    //
+    // services
     include_once("./services/receiver.service.php");
-    //
+    include_once("./services/auth.service.php");
+    // decorators
+    include_once("./decorators/decorator.php");
+    include_once("./decorators/auth.decorator.php");
+    include_once("./decorators/ldap-auth.decorator.php");
+    include_once("./decorators/mysql-auth.decorator.php");
+    include_once("./decorators/bypass-auth.decorator.php");
+    // factories
+    include_once("./factories/ldap-auth.factory.php");
+    include_once("./factories/mysql-auth.factory.php");
+    include_once("./factories/bypass-auth.factory.php");
+    // utils
     include_once("./utils/constants.php");
+    include_once("./utils/make-dns-from-ini.util.php");
     //
-
     use Controllers\Auth;
     use Controllers\HttpResponse;
     use Controllers\ReceiverController;
     use Utils\ResponseStatus;
-    
+    // use function Factories\makeLdapAuthService;
+    use function Factories\makeByPassAuthService;
+    // use function Factories\makeMysqlAuthService;
+
     $controller = new ReceiverController();
     $response = new HttpResponse();
-    $auth = new Auth();
+    $auth = new Auth(makeByPassAuthService());
 
     if (!$controller->validateMethodAccess()) {
-        $response->makeResponse("", ResponseStatus::METHOD_NOT_ALLOWED, "Metodo não permitido");
+        $response->makeResponse("Método não permitido", ResponseStatus::METHOD_NOT_ALLOWED);
         return;
     }
 
-    
     if (!$auth->validate()) {
         $response->makeResponse("Usuário e/ou senha inválidos!", ResponseStatus::UNAUTHORIZED);
         return;
@@ -45,9 +59,9 @@
     }
 
     $created = $controller->createFile();
-    
+
     if ($created) {
-        $response->makeResponse($targetFilename, ResponseStatus::OK, "Arquivo criado com sucesso em $targetFilename");
+        $response->makeResponse($targetFilename, "Arquivo criado com sucesso em $targetFilename");
         return;
     }
 ?>
