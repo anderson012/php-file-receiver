@@ -21,6 +21,7 @@
     // utils
     include_once("./utils/constants.php");
     include_once("./utils/make-dns-from-ini.util.php");
+    include_once("./utils/read-ini.util.php");
     //
     use Controllers\Auth;
     use Controllers\HttpResponse;
@@ -61,7 +62,9 @@
     $created = $controller->createFile();
 
     if ($created) {
-        $response->makeResponse($targetFilename, "Arquivo criado com sucesso em $targetFilename");
+        $targetFilename = $controller->getTargetFile();
+        $targetDir = $controller->getTargetDir();
+        $response->makeResponse("Arquivo criado com sucesso em $targetDir/$targetFilename", ResponseStatus::OK, "$targetDir/$targetFilename");
         return;
     }
 ?>
