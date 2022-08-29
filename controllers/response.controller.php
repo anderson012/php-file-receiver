@@ -8,7 +8,7 @@
         public static function makeResponse($msg,  $code = ResponseStatus::OK, $resp = null) {
             http_response_code($code);
             header(ResponseType::JSON_TYPE);
-            $resp = json_encode(array("result"=>$resp, "mgs"=>$msg, "code"=>$code));
+            $resp = json_encode(array("result"=>$resp, "msg"=>$msg, "code"=>$code));
             echo($resp);
         }
     }
