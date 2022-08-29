@@ -16,10 +16,12 @@
         }
 
         public function setTargetDir($file) {
-            if (strpos($file, Files::WS_REPORT) === true) {
+            if (preg_match(Files::WS_REPORT, $file) === 1) {
                 $this->targetDir = Path::WS_REPORT;
-            } else if (strpos($file, Files::EDUCATION) === true) {
+            } else if (preg_match(Files::EDUCATION, $file) === 1) {
                 $this->targetDir = Path::EDUCATION;
+            } else {
+                echo "";
             }
         }
 
@@ -38,7 +40,7 @@
             if (is_null($this->tmpFilename) || !is_uploaded_file($this->tmpFilename)) {
                 return false;
             //TODO: alterar para regex
-            } else if (strpos($this->targetFile, Files::WS_REPORT) === false && strpos($this->targetFile, Files::EDUCATION) === false) {
+            } else if (preg_match(Files::WS_REPORT, $this->targetFile) === 0 && strpos(Files::EDUCATION, $this->targetFile) === 0) {
                 return false;
             }
             return true;
@@ -49,7 +51,7 @@
         }
 
         public function createFile(): bool {
-            return $this->service->createFile($this->tmpFilename, $this->targetFile);
+            return $this->service->createFile($this->tmpFilename, "$this->targetDir/$this->targetFile");
         }
 
         public function validateMethodAccess() {
@@ -61,6 +63,10 @@
         //Getters and setters
         public function getTargetFile() {
             return $this->targetFile;
+        }
+
+        public function getTargetDir() {
+            return $this->targetDir;
         }
     }
 ?>
