@@ -11,7 +11,7 @@ export function makeLoading(element) {
         const diff = bytes - lastBytes;
         lastBytes = bytes;
 
-        size = `${size < 0 ? 1 : size}%`;
+        size = `${size < 0 ? 10 : size}%`;
         element.querySelector(".progress-bar").style.width = size;
         element.querySelector(".progress-bar").textContent = `${size} (${(diff / 1024 / 1024).toFixed(2)}mb/s)`;
     }
@@ -53,5 +53,15 @@ export function generateVersion() {
  * @returns {boolean} true if all values are valid
  */
 export function validate(forms) {
-    return Object.values(forms).every(value => value !== null && value !== undefined && value !== "");
+    return Object.values(forms).every(value => value !== null && value !== undefined && (typeof value == "string" ? value.trim() : true));
+}
+
+export function getAuth() {
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+
+    return {
+        username: username.value,
+        password: password.value,
+    }
 }

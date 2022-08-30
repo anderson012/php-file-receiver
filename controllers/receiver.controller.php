@@ -10,17 +10,17 @@
         private $targetFile = "";
         private $tmpFilename = "";
         private $service = null;
+        private ?string $version = null;
 
         function __construct() {
             $this->service = new ReceiverService();
         }
 
         public function setTargetDir($file) {
-            $version = $_POST["version"];
             if (preg_match(Files::WS_REPORT, $file) === 1) {
-                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::WS_REPORT, "$version"));
+                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::WS_REPORT, "versions", $this->version));
             } else if (preg_match(Files::EDUCATION, $file) === 1) {
-                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::EDUCATION, "$version"));
+                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::EDUCATION, "versions", $this->version));
             } else {
                 echo "";
             }
@@ -31,6 +31,7 @@
                 $file = $_FILES["file"]["tmp_name"];
                 $this->tmpFilename = $file;
                 $this->targetFile = $_FILES["file"]["name"];
+                $this->version = $_POST["version"];
                 $this->setTargetDir($this->targetFile);
                 $this->service->createDir($this->targetDir);
             }
@@ -52,6 +53,7 @@
         }
 
         public function createFile(): bool {
+            $this->service->createLastVersionFile("$this->targetDir/../version.info", $this->version);
             return $this->service->createFile($this->tmpFilename, "$this->targetDir/$this->targetFile");
         }
         //Getters and setters

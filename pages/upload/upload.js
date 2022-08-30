@@ -1,16 +1,13 @@
-import { generateVersion, makeLoading, validate } from "../templates/utils.js"
+import { generateVersion, makeLoading, validate, getAuth } from "../templates/utils.js"
 
 (() => {
     const submit = document.getElementById("submit");
     const fileInput = document.getElementById("file");
-    const username = document.getElementById("username");
-    const password = document.getElementById("password");
     const uploadProgress = document.getElementById("upload-progress");
     const fileVersion = document.getElementById("file-version");
     const btnVersion = document.getElementById("button-version");
 
     const loading = makeLoading(uploadProgress);
-
     let file = null;
 
     /**
@@ -21,8 +18,7 @@ import { generateVersion, makeLoading, validate } from "../templates/utils.js"
         e.preventDefault();
         const valid = validate({
             version: fileVersion.value,
-            username: username.value,
-            password: password.value,
+            ...getAuth(),
             file: file,
         });
 
@@ -39,14 +35,11 @@ import { generateVersion, makeLoading, validate } from "../templates/utils.js"
             fileInput.setAttribute("disabled", true);
             loading.show();
             loading.start();
-            const { data } = await axios.post("/index.php", form, {
+            const { data } = await axios.post("/routers/upload/index.php", form, {
                 headers: {
                     "content-type": "multipart/form-data"
                 },
-                auth: {
-                    username: username.value,
-                    password: password.value
-                },
+                auth: getAuth(),
                 onUploadProgress: (event) => {
                     let progress = (
                         (event.loaded * 100) / event.total

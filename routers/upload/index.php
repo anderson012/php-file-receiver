@@ -38,7 +38,7 @@
     $response = new HttpResponse();
     $auth = new Auth(makeByPassAuthService());
 
-    if (validateMethodAccess()) {
+    if (!validateMethodAccess()) {
         $response->makeResponse("Método não permitido", ResponseStatus::METHOD_NOT_ALLOWED);
         return;
     }
