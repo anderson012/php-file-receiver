@@ -54,13 +54,6 @@
         public function createFile(): bool {
             return $this->service->createFile($this->tmpFilename, "$this->targetDir/$this->targetFile");
         }
-
-        public function validateMethodAccess() {
-            return $_SERVER["REQUEST_METHOD"] === "POST";
-        }
-
-
-
         //Getters and setters
         public function getTargetFile() {
             return $this->targetFile;

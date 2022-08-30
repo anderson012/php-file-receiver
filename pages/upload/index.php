@@ -21,7 +21,6 @@
 
 <?php 
     $scripts = '
-        <script type="module" src="/pages/templates/utils.js?version=' . Utils\General::VERSION . '"></script>
         <script type="module" src="./upload.js?version='. Utils\General::VERSION . '"></script>
     ';
     include_once("../templates/footer.template.php"); 
