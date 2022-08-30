@@ -16,10 +16,11 @@
         }
 
         public function setTargetDir($file) {
+            $version = $_POST["version"];
             if (preg_match(Files::WS_REPORT, $file) === 1) {
-                $this->targetDir = Path::WS_REPORT;
+                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::WS_REPORT, "$version"));
             } else if (preg_match(Files::EDUCATION, $file) === 1) {
-                $this->targetDir = Path::EDUCATION;
+                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::EDUCATION, "$version"));
             } else {
                 echo "";
             }
@@ -31,15 +32,15 @@
                 $this->tmpFilename = $file;
                 $this->targetFile = $_FILES["file"]["name"];
                 $this->setTargetDir($this->targetFile);
+                $this->service->createDir($this->targetDir);
             }
-            
+
             return $this->tmpFilename;
         }
 
         public function validate(): bool {
             if (is_null($this->tmpFilename) || !is_uploaded_file($this->tmpFilename)) {
                 return false;
-            //TODO: alterar para regex
             } else if (preg_match(Files::WS_REPORT, $this->targetFile) === 0 && strpos(Files::EDUCATION, $this->targetFile) === 0) {
                 return false;
             }

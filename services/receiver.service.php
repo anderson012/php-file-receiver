@@ -11,5 +11,11 @@
                 return move_uploaded_file($tmpFile, $targetFile);
             }
         }
+
+        public function createDir($dir) {
+            if (!is_dir($dir)) {
+                mkdir($dir);
+            }
+        }
     }
 ?>

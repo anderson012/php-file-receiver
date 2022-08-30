@@ -12,7 +12,6 @@
             $users = explode("|", $config["database"]["username"]);
             $passwords = explode("|", $config["database"]["password"]);
             $pass = md5($pass);
-
             if (isset($user) && !empty($user) && isset($pass) && !empty($pass)) {
                 return in_array($user, $users) && in_array($pass, $passwords);
             }

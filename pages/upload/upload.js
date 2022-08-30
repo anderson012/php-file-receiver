@@ -1,15 +1,15 @@
-import { generateVersion } from "./utils.js"
+import { generateVersion, makeLoading, validate } from "../templates/utils.js"
 
 (() => {
     const submit = document.getElementById("submit");
     const fileInput = document.getElementById("file");
-    const applyPass = document.getElementById("apply-pass");
     const username = document.getElementById("username");
     const password = document.getElementById("password");
     const uploadProgress = document.getElementById("upload-progress");
     const fileVersion = document.getElementById("file-version");
     const btnVersion = document.getElementById("button-version");
 
+    const loading = makeLoading(uploadProgress);
 
     let file = null;
 
@@ -19,12 +19,26 @@ import { generateVersion } from "./utils.js"
      */
     async function upload(e) {
         e.preventDefault();
+        const valid = validate({
+            version: fileVersion.value,
+            username: username.value,
+            password: password.value,
+            file: file,
+        });
+
+        if (!valid) {
+            swal.fire("Atenção", "Formulário inválido", "warning");
+            return;
+        }
+
         try {
             const form = new FormData();
             form.append("file", file)
+            form.append("version", fileVersion.value);
             submit.setAttribute("disabled", true);
             fileInput.setAttribute("disabled", true);
-            uploadProgress.classList.remove("invisible");
+            loading.show();
+            loading.start();
             const { data } = await axios.post("/index.php", form, {
                 headers: {
                     "content-type": "multipart/form-data"
@@ -32,16 +46,28 @@ import { generateVersion } from "./utils.js"
                 auth: {
                     username: username.value,
                     password: password.value
-                }
+                },
+                onUploadProgress: (event) => {
+                    let progress = (
+                        (event.loaded * 100) / event.total
+                    ).toFixed(2);
+        
+                    console.log(
+                        `A imagem ${file.name} está ${progress}% carregada... `
+                    )
+                    loading.setSize(progress, event.loaded);
+                },
             });
-            alert(`Arquivo enviado com sucesso! ${data.result ?? data.msg}`)
+            swal.fire("Informação", `Arquivo enviado com sucesso! ${data.result ?? data.msg}`, "info");
         } catch(e) {
-            console.log(e);
-            swal.fire(e?.response?.data?.msg ?? e.message ?? "Processo inesperado no servidor")
+            console.warn(e);
+            swal.fire("Oops", e?.response?.data?.msg ?? e.message ?? "Processo inesperado no servidor", "warning");
         } finally {
             submit.removeAttribute("disabled");
             fileInput.removeAttribute("disabled");
-            uploadProgress.classList.add("invisible");
+            loading.finish();
+            loading.hide();
+            loading.setSize(0);
         }
     }
 
@@ -56,19 +82,8 @@ import { generateVersion } from "./utils.js"
         }
     }
 
-    function onClickApplyPass() {
-        if (username.getAttribute("disabled")) {
-            username.removeAttribute("disabled")
-            password.removeAttribute("disabled")
-        } else {
-            username.setAttribute("disabled", true);
-            password.setAttribute("disabled", true);
-        }
-    }
-
     fileInput.addEventListener("change", onChangeFile);
     submit.addEventListener("click", upload);
-    applyPass.addEventListener("click", onClickApplyPass);
     btnVersion.addEventListener("click", () => {
         fileVersion.value = generateVersion();
     })

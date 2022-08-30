@@ -23,5 +23,6 @@
 
     class General {
         const LDAP_SERVER = "ldap://localhost";
+        const VERSION = "v0.0.1";
     }
 ?>
