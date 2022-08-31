@@ -65,7 +65,7 @@
             }
             $response->makeResponse("Arquivo criado em <b>$targetFile</b>");
         } catch(Exception $e) {
-            $response->makeResponse("Falha ao juntar partes do arquivo $e->", ResponseStatus::INTERNAL_SERVER_ERROR, array("chunks"=>$chunks, "found"=>$chunksUploaded));
+            $response->makeResponse("Falha ao juntar partes do arquivo $e->$message", ResponseStatus::INTERNAL_SERVER_ERROR, array("chunks"=>$chunks, "found"=>$chunksUploaded));
         }
     } else {
         $response->makeResponse("Algumas partes não foram encontradas", ResponseStatus::INTERNAL_SERVER_ERROR, array("chunks"=>$chunks, "found"=>$chunksUploaded));
