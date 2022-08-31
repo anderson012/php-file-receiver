@@ -7,17 +7,32 @@ function strZero (n, len) {
 
 export function makeLoading(element) {
     let lastBytes = 0;
-    function setSize (size, bytes) {
-        const diff = bytes - lastBytes;
-        lastBytes = bytes;
+    const setSize = (size, bytes = 0, message) => {
+        let transfer = "0mbs";
+        if (!isNaN(bytes)) {
+            const diff = bytes - lastBytes;
+            lastBytes = bytes;
 
-        size = `${size < 0 ? 10 : size}%`;
+            size = `${size < 0 ? 10 : size}%`;
+            transfer = `${(diff / 1024 / 1024).toFixed(2)}mb/s`;
+        } else {
+            transfer = undefined;
+        }
         element.querySelector(".progress-bar").style.width = size;
-        element.querySelector(".progress-bar").textContent = `${size} (${(diff / 1024 / 1024).toFixed(2)}mb/s)`;
+        element.querySelector(".progress-bar").textContent = `${size} (${transfer ?? message ?? "-"})`;
     }
     return {
         show: () => {
             element.classList.remove("invisible");
+        },
+        changeColor: (color="danger") => {
+            const progressBar = element.querySelector(".progress-bar");
+            progressBar.classList.forEach((classItem) => {
+                if (classItem.includes("bg-")) {
+                    progressBar.classList.remove(classItem);
+                }
+            })
+            progressBar.classList.add(`bg-${color}`);
         },
         hide: () => {
             element.classList.add("invisible");
