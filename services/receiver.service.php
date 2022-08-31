@@ -22,7 +22,7 @@
 
         public function createDir($dir) {
             if (!is_dir($dir)) {
-                mkdir($dir);
+                mkdir($dir, 0777, true);
             }
         }
     }
