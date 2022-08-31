@@ -65,3 +65,26 @@ export function getAuth() {
         password: password.value,
     }
 }
+
+/**
+ * 
+ * @param {Blob|File} file file to split
+ * @param {number} len in MB
+ * @returns {Blob[]} blob list to upload
+ */
+export function splitFile(file, chunkSize = 10) {
+    chunkSize = chunkSize * 1024 * 1024;
+    if (file.size <= chunkSize) {
+        return [file];
+    }
+    let start = 0;
+    let end = chunkSize;
+    let chunks = [];
+    while (start < file.size) {
+        chunks.push(file.slice(start, end, file.type + "-part"));
+        start = end;
+        end += chunkSize;
+    }
+
+    return chunks;
+}
