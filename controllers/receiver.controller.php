@@ -10,16 +10,19 @@
         private $targetFile = "";
         private $tmpFilename = "";
         private $service = null;
+        private ?string $version = null;
 
         function __construct() {
             $this->service = new ReceiverService();
         }
 
         public function setTargetDir($file) {
-            if (strpos($file, Files::WS_REPORT) === true) {
-                $this->targetDir = Path::WS_REPORT;
-            } else if (strpos($file, Files::EDUCATION) === true) {
-                $this->targetDir = Path::EDUCATION;
+            if (preg_match(Files::WS_REPORT, $file) === 1) {
+                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::WS_REPORT, "versions", $this->version));
+            } else if (preg_match(Files::EDUCATION, $file) === 1) {
+                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::EDUCATION, "versions", $this->version));
+            } else {
+                echo "";
             }
         }
 
@@ -28,17 +31,18 @@
                 $file = $_FILES["file"]["tmp_name"];
                 $this->tmpFilename = $file;
                 $this->targetFile = $_FILES["file"]["name"];
+                $this->version = $_POST["version"];
                 $this->setTargetDir($this->targetFile);
+                $this->service->createDir($this->targetDir);
             }
-            
+
             return $this->tmpFilename;
         }
 
         public function validate(): bool {
             if (is_null($this->tmpFilename) || !is_uploaded_file($this->tmpFilename)) {
                 return false;
-            //TODO: alterar para regex
-            } else if (strpos($this->targetFile, Files::WS_REPORT) === false && strpos($this->targetFile, Files::EDUCATION) === false) {
+            } else if (preg_match(Files::WS_REPORT, $this->targetFile) === 0 && strpos(Files::EDUCATION, $this->targetFile) === 0) {
                 return false;
             }
             return true;
@@ -49,18 +53,16 @@
         }
 
         public function createFile(): bool {
-            return $this->service->createFile($this->tmpFilename, $this->targetFile);
+            $this->service->createLastVersionFile("$this->targetDir/../version.info", $this->version);
+            return $this->service->createFile($this->tmpFilename, "$this->targetDir/$this->targetFile");
         }
-
-        public function validateMethodAccess() {
-            return $_SERVER["REQUEST_METHOD"] === "POST";
-        }
-
-
-
         //Getters and setters
         public function getTargetFile() {
             return $this->targetFile;
+        }
+
+        public function getTargetDir() {
+            return $this->targetDir;
         }
     }
 ?>

@@ -12,16 +12,17 @@
     }
 
     class Path {
-        const WS_REPORT = "C:\\Users\\ander\\projetos\\php-file-upload\\upload\\wsreport";
-        const EDUCATION = "C:\\Users\\ander\\projetos\\php-file-upload\\upload\\educacao";
+        const WS_REPORT = __DIR__ . "/../upload";
+        const EDUCATION = __DIR__ . "/../upload";
     }
 
     class Files {
-        const WS_REPORT = "WsReport-1.2.dll";
-        const EDUCATION = "Education.exe";
+        const WS_REPORT = "/WsReport-1.2.dll/i";
+        const EDUCATION = "/.png|Educacao|Biblioteca/i";
     }
 
     class General {
         const LDAP_SERVER = "ldap://localhost";
+        const VERSION = "v0.0.1";
     }
 ?>
