@@ -9,11 +9,11 @@ export function makeLoading(element) {
     let lastBytes = 0;
     const setSize = (size, bytes = 0, message) => {
         let transfer = "0mbs";
-        if (!isNaN(bytes)) {
+        size = `${size < 0 ? 10 : size}%`;
+
+        if (bytes != null) {
             const diff = bytes - lastBytes;
             lastBytes = bytes;
-
-            size = `${size < 0 ? 10 : size}%`;
             transfer = `${(diff / 1024 / 1024).toFixed(2)}mb/s`;
         } else {
             transfer = undefined;
