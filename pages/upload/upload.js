@@ -93,7 +93,7 @@ import { generateVersion, makeLoading, validate, getAuth, splitFile } from "../t
         const form = new FormData();
         form.append("targetFile", filePart.split("-part")[0])
         form.append("chunks", files.length);
-        swal.fire("Juntando arquivos");
+        swal.fire("Juntando partes.");
         swal.showLoading();
         const {data} = await axios.post("/routers/join-parts/index.php", form, {
             headers: {

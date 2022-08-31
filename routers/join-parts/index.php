@@ -17,6 +17,7 @@
     include_once("../../utils/constants.php");
     include_once("../../utils/read-ini.util.php");
     include_once("../../utils/validate-method-access.util.php");
+    include_once("../../utils/generate-url.util.php");
 
     use Controllers\Auth;
     use Controllers\HttpResponse;
@@ -24,6 +25,7 @@
     use Utils\ResponseStatus;
 
     use function Factories\makeByPassAuthService;
+    use function Utils\generateUrl;
     use function Utils\validateMethodAccess;
 
     $auth = new Auth(makeByPassAuthService());
@@ -63,7 +65,9 @@
                 fclose($final);
                 unlink($filename);
             }
-            $response->makeResponse("Arquivo criado em <b>$targetFile</b>");
+            $url = generateUrl($targetFile);
+
+            $response->makeResponse("Arquivo criado em <b>$targetFile</b>", ResponseStatus::OK, $url);
         } catch(Exception $e) {
             $response->makeResponse("Falha ao juntar partes do arquivo $e->$message", ResponseStatus::INTERNAL_SERVER_ERROR, array("chunks"=>$chunks, "found"=>$chunksUploaded));
         }
