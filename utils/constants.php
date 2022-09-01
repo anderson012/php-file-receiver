@@ -13,13 +13,13 @@
 
     class Path {
         const WS_REPORT = __DIR__ . "/../upload/ws";
-        const EDUCATION = __DIR__ . "/../upload/edu";
+        const EDUCATION = __DIR__ . "/../upload/edu.com";
         const DBS = __DIR__ . "/../upload/db";
     }
 
     class Files {
         const WS_REPORT = "/WsReport-1.2.dll/i";
-        const EDUCATION = "/.OmegaSistemas/";
+        const EDUCATION = "/.OmegaSistemas|.exe|.mp4/";
         const DBS = "/.zip|.dat|.rar|.dmp|.bak/i";
     }
 
