@@ -17,12 +17,15 @@
     include_once("../../utils/constants.php");
     include_once("../../utils/read-ini.util.php");
     include_once("../../utils/validate-method-access.util.php");
+    include_once("../../utils/generate-url.util.php");
 
     use Controllers\Auth;
     use Controllers\HttpResponse;
+    use Exception;
     use Utils\ResponseStatus;
 
     use function Factories\makeByPassAuthService;
+    use function Utils\generateUrl;
     use function Utils\validateMethodAccess;
 
     $auth = new Auth(makeByPassAuthService());
@@ -50,18 +53,24 @@
     }
 
     if ($chunksUploaded === intval($chunks)) {
-        for ($i = 0; $i < $chunks; $i++) {
-            $filename = $targetFile . "-part$i";
-            $file = fopen($filename, 'rb');
-            $buff = fread($file, filesize($filename));
-            fclose($file);
+        try {
+            for ($i = 0; $i < $chunks; $i++) {
+                $filename = $targetFile . "-part$i";
+                $file = fopen($filename, 'rb');
+                $buff = fread($file, filesize($filename));
+                fclose($file);
 
-            $final = fopen($targetFile, 'ab');
-            $write = fwrite($final, $buff);
-            fclose($final);
-            unlink($filename);
+                $final = fopen($targetFile, 'ab');
+                $write = fwrite($final, $buff);
+                fclose($final);
+                unlink($filename);
+            }
+            $url = generateUrl($targetFile);
+
+            $response->makeResponse("Arquivo criado em <b>$targetFile</b>", ResponseStatus::OK, $url);
+        } catch(Exception $e) {
+            $response->makeResponse("Falha ao juntar partes do arquivo $e->$message", ResponseStatus::INTERNAL_SERVER_ERROR, array("chunks"=>$chunks, "found"=>$chunksUploaded));
         }
-        $response->makeResponse("Arquivo criado em <b>$targetFile</b>");
     } else {
         $response->makeResponse("Algumas partes não foram encontradas", ResponseStatus::INTERNAL_SERVER_ERROR, array("chunks"=>$chunks, "found"=>$chunksUploaded));
     }

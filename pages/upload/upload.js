@@ -6,6 +6,8 @@ import { generateVersion, makeLoading, validate, getAuth, splitFile } from "../t
     const uploadProgress = document.getElementById("upload-progress");
     const fileVersion = document.getElementById("file-version");
     const btnVersion = document.getElementById("button-version");
+    const chunkSize = document.getElementById("chunk-size");
+    const MAX_PARALLEL_REQ = 3;
 
     // let loading = makeLoading(uploadProgress);
     /**
@@ -36,11 +38,11 @@ import { generateVersion, makeLoading, validate, getAuth, splitFile } from "../t
 
         try {
             let data = {};
-            for (let file of files) {
+            await async.eachLimit(files, MAX_PARALLEL_REQ, async (file) => {
                 data = await uploadSingleFile(file, files.indexOf(file));
-            }
+            });
             data = await joinFile(data.result);
-            swal.fire("Informação", `Arquivo enviado com sucesso! ${data.result ?? data.msg ?? ""}`, "info");
+            swal.fire("Yuupiii 🥳 🤩", `Arquivo enviado com sucesso! ${data.result ?? data.msg ?? ""}`, "success");
         } catch(e) {
             console.warn(e);
             swal.fire("Oops", e?.response?.data?.msg ?? e.message ?? "Processo inesperado no servidor", "warning");
@@ -64,29 +66,34 @@ import { generateVersion, makeLoading, validate, getAuth, splitFile } from "../t
         fileInput.setAttribute("disabled", true);
         const elementUpload = document.getElementById(`upload-progress-${index}`)
         const loading = makeLoading(elementUpload);
-        loading.show();
+        // loading.show();
         loading.start();
-        const {data} = await axios.post("/routers/upload/index.php", form, {
-            headers: {
-                "content-type": "multipart/form-data"
-            },
-            auth: getAuth(),
-            onUploadProgress: (event) => {
-                let progress = (
-                    (event.loaded * 100) / event.total
-                ).toFixed(2);
-
-                loading.setSize(progress, event.loaded);
-            },
-        });
-        return data;
+        try {
+            let {data} = await axios.post("/routers/upload/index.php", form, {
+                headers: {
+                    "content-type": "multipart/form-data"
+                },
+                auth: getAuth(),
+                onUploadProgress: (event) => {
+                    let progress = (
+                        (event.loaded * 100) / event.total
+                    ).toFixed(2);
+                    loading.setSize(progress, event.loaded);
+                },
+            });
+            loading.changeColor("success");
+            return data;
+        } catch (e) {
+            loading.changeColor();
+            throw e;
+        }
     }
 
     async function joinFile(filePart) {
         const form = new FormData();
         form.append("targetFile", filePart.split("-part")[0])
         form.append("chunks", files.length);
-        swal.fire("Juntanto arquivos");
+        swal.fire("Juntando partes.");
         swal.showLoading();
         const {data} = await axios.post("/routers/join-parts/index.php", form, {
             headers: {
@@ -113,7 +120,7 @@ import { generateVersion, makeLoading, validate, getAuth, splitFile } from "../t
         }).join("");
 
         document.getElementById("upload-list").innerHTML = `
-            <h5 class="card-title">Aproximadamente ${(originalFile.size /1024/1024).toFixed(2)}Mb em ${files.length} partes para enviar</h5>
+            <h5 class="card-title">Aproximadamente ${(originalFile.size /1024/1024).toFixed(2)}mb em ${files.length} partes para enviar</h5>
             <ol class="list-group list-group-numbered">
                 ${html}
             </ol>
@@ -127,7 +134,13 @@ import { generateVersion, makeLoading, validate, getAuth, splitFile } from "../t
         originalFile = e.target.files[0];
 
         if (originalFile) {
-            files = splitFile(originalFile);
+            const chunkSizeValue = Number(chunkSize.value);
+            if (chunkSizeValue < 10 || chunkSizeValue > 100) {
+                swal.fire("Oops", "O valor de corte deve ser maior que 10mb e menor que 100mb", "warning");
+                e.target.value = null;
+                return;
+            }
+            files = splitFile(originalFile, chunkSizeValue);
             mountListOfUpload();
             console.log(files);
             submit.removeAttribute("disabled");

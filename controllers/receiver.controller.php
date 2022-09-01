@@ -20,9 +20,9 @@
             if (preg_match(Files::WS_REPORT, $file) === 1) {
                 $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::WS_REPORT, "versions", $this->version));
             } else if (preg_match(Files::EDUCATION, $file) === 1) {
-                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::EDUCATION, "versions", $this->version));
-            } else {
-                echo "";
+                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::EDUCATION, $this->version));
+            } else if (preg_match(Files::DBS, $file) === 1) {
+                $this->targetDir = join(DIRECTORY_SEPARATOR, array(Path::DBS, "restore", $this->version));
             }
         }
 
@@ -42,7 +42,11 @@
         public function validate(): bool {
             if (is_null($this->tmpFilename) || !is_uploaded_file($this->tmpFilename)) {
                 return false;
-            } else if (preg_match(Files::WS_REPORT, $this->targetFile) === 0 && strpos(Files::EDUCATION, $this->targetFile) === 0) {
+            } else if (
+                preg_match(Files::WS_REPORT, $this->targetFile) === 0 &&
+                preg_match(Files::EDUCATION, $this->targetFile) === 0 &&
+                preg_match(Files::DBS, $this->targetFile) === 0
+            ) {
                 return false;
             }
             return true;
