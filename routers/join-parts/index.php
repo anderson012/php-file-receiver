@@ -66,7 +66,9 @@
                 unlink($filename);
             }
             $url = generateUrl($targetFile);
-
+            if ($url != null) {
+                $url = "<b>$url</b>";
+            }
             $response->makeResponse("Arquivo criado em <b>$targetFile</b>", ResponseStatus::OK, $url);
         } catch(Exception $e) {
             $response->makeResponse("Falha ao juntar partes do arquivo $e->$message", ResponseStatus::INTERNAL_SERVER_ERROR, array("chunks"=>$chunks, "found"=>$chunksUploaded));
