@@ -1,5 +1,6 @@
 <?php
-    include_once("../../utils/constants.php");
+    include_once(__DIR__ . "/../../utils/constants.php");
+    use Utils\General;
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -13,15 +14,20 @@
 </head>
 <body>
     <div class="container">
-        <h3 class="mt-3"><?php echo $title?></h3>
-        <div class="mb-2 card mt-3">
-            <div class="card-body">
-                <h5 class="card-title">Autenticação</h5>
-                <label class="form-label" for="username">Usuário</label>
-                <input class="form-control" name="username" id="username" />
-
-                <label class="form-label" for="password">Senha</label>
-                <input class="form-control" name="password" type="password" id="password" />
-                <button class="btn btn-primary mt-2" id="apply-pass">Aplicar</button>
-            </div>
+        <div class="d-flex align-items-center mt-3">
+            <h3 class="me-2"><?php echo $title?></h3>
+            <span class="badge rounded-pill text-bg-primary d-flex"><?php echo General::VERSION ?></span>
         </div>
+        <?php if (!isset($auth) || $auth) { ?>
+            <div class="mb-2 card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Autenticação</h5>
+                    <label class="form-label" for="username">Usuário</label>
+                    <input class="form-control" name="username" id="username" />
+
+                    <label class="form-label" for="password">Senha</label>
+                    <input class="form-control" name="password" type="password" id="password" />
+                    <button class="btn btn-primary mt-2" id="apply-pass">Aplicar</button>
+                </div>
+            </div>
+        <?php } ?>
