@@ -28,11 +28,18 @@ export function makeLoading(element) {
         changeColor: (color="danger") => {
             const progressBar = element.querySelector(".progress-bar");
             progressBar.classList.forEach((classItem) => {
-                if (classItem.includes("bg-")) {
+                if (classItem.includes("bg-") || classItem.includes("text-")) {
                     progressBar.classList.remove(classItem);
                 }
-            })
-            progressBar.classList.add(`bg-${color}`);
+            });
+
+            const classList = [`bg-${color}`];
+
+            if (color == "warning") {
+                classList.push("text-dark");
+            }
+
+            progressBar.classList.add.apply(progressBar.classList, classList);
         },
         hide: () => {
             element.classList.add("invisible");
@@ -102,4 +109,28 @@ export function splitFile(file, chunkSize = 10) {
     }
 
     return chunks;
+}
+
+/**
+ * @param {HTMLElement[]} elements list of elements to add the classes
+ * @param {string[]|string} classes a list of classes to add to elements
+ * @return {HTMLElement[]} the list of elements
+ */
+export function addClass(elements, classes) {
+    classes = typeof classes === "string" ? [classes] : classes;
+    elements = elements.length === undefined ? [elements] : elements;
+    elements.forEach(it => it.classList.add(...classes))
+    return elements;
+}
+
+/**
+ * @param {HTMLElement[]} elements list of elements to add the classes
+ * @param {string[]|string} classes a list of classes to add to elements
+ * @return {HTMLElement[]} the list of elements
+ */
+ export function removeClass(elements, classes) {
+    classes = typeof classes === "string" ? [classes] : classes;
+    elements = elements.length === undefined ? [elements] : elements;
+    elements.forEach(it => it.classList.remove(...classes))
+    return elements;
 }
